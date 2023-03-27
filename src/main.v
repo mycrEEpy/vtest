@@ -10,8 +10,13 @@ fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application('vtest')
 
-	port := fp.int('port', 0, 8000, 'listen port')
-	help := fp.bool('help', 0, false, 'print help')
+	port := fp.int('port', `p`, 8000, 'listen port')
+	help := fp.bool('help', `h`, false, 'print help')
+
+	fp.finalize() or {
+		eprintln(err)
+		exit(1)
+	}
 
 	if help {
 		println(fp.usage())
