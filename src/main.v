@@ -32,7 +32,7 @@ fn main() {
 
 	spawn fn (mut a app.App) {
 		time.sleep(time.second * 5)
-		a.set_status(.dead)
+		a.set_status(.unavailable)
 	}(mut &a)
 
 	s.listen_and_serve()

@@ -12,8 +12,8 @@ pub fn (mut a App) set_status(status Status) {
 }
 
 pub enum Status {
-	alive
-	dead
+	ready
+	unavailable
 }
 
 pub fn (a App) handle(req http.Request) http.Response {
@@ -25,8 +25,8 @@ pub fn (a App) handle(req http.Request) http.Response {
 		}
 		'/_ready' {
 			match a.status {
-				.alive { http.new_response(status: .ok, body: 'ready') }
-				.dead { http.new_response(status: .service_unavailable, body: 'unavailable') }
+				.ready { http.new_response(status: .ok, body: 'ready') }
+				.unavailable { http.new_response(status: .service_unavailable, body: 'unavailable') }
 			}
 		}
 		'/_live' {
