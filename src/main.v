@@ -1,6 +1,5 @@
 module main
 
-import net.http
 import flag
 import os
 import app
@@ -29,12 +28,10 @@ fn main() {
 		exit(1)
 	}
 
-	mut a := app.new(parsed_level)
+	mut a := app.new(port, parsed_level)
 
-	mut s := http.Server{
-		port: port
-		handler: a
-	}
+	os.signal_opt(.int, a.stop_on_signal)!
+	os.signal_opt(.term, a.stop_on_signal)!
 
-	s.listen_and_serve()
+	a.listen_and_serve()
 }

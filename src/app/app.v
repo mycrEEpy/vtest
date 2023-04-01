@@ -2,11 +2,15 @@ module app
 
 import net.http
 import log
+import os
+import time
 
+[heap]
 struct App {
 mut:
 	logger log.Log
 	status Status
+	server http.Server
 }
 
 enum Status {
@@ -14,10 +18,15 @@ enum Status {
 	unavailable
 }
 
-pub fn new(level log.Level) App {
+pub fn new(port int, level log.Level) App {
 	mut a := App{}
 
 	a.logger.set_level(level)
+
+	a.server = http.Server{
+		port: port
+		handler: a
+	}
 
 	return a
 }
@@ -64,4 +73,14 @@ fn (mut a App) handle(req http.Request) http.Response {
 			http.new_response(status: .not_found, body: 'not found')
 		}
 	}
+}
+
+pub fn (mut a App) listen_and_serve() {
+	a.server.listen_and_serve()
+}
+
+pub fn (mut a App) stop_on_signal(_ os.Signal) {
+	a.status = .unavailable
+	time.sleep(30 * time.second)
+	a.server.stop()
 }
