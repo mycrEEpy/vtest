@@ -3,20 +3,16 @@ module app
 import net.http
 
 pub struct App {
-pub mut:
+mut:
 	status Status
 }
 
-pub fn (mut a App) set_status(status Status) {
-	a.status = status
-}
-
-pub enum Status {
+enum Status {
 	ready
 	unavailable
 }
 
-pub fn (a App) handle(req http.Request) http.Response {
+fn (a App) handle(req http.Request) http.Response {
 	println('got request for ${req.url}')
 
 	return match req.url {
