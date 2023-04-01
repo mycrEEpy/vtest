@@ -17,16 +17,38 @@ fn (a App) handle(req http.Request) http.Response {
 
 	return match req.url {
 		'/' {
-			http.new_response(status: .ok, body: 'this is the root')
+			match req.method {
+				.get {
+					http.new_response(status: .ok, body: 'this is the root')
+				}
+				else {
+					http.new_response(status: .method_not_allowed)
+				}
+			}
+
 		}
 		'/_ready' {
-			match a.status {
-				.ready { http.new_response(status: .ok, body: 'ready') }
-				.unavailable { http.new_response(status: .service_unavailable, body: 'unavailable') }
+			match req.method {
+				.get {
+					match a.status {
+						.ready { http.new_response(status: .ok, body: 'ready') }
+						.unavailable { http.new_response(status: .service_unavailable, body: 'unavailable') }
+					}
+				}
+				else {
+					http.new_response(status: .method_not_allowed)
+				}
 			}
 		}
 		'/_live' {
-			http.new_response(status: .ok, body: 'alive')
+			match req.method {
+				.get {
+					http.new_response(status: .ok, body: 'alive')
+				}
+				else {
+					http.new_response(status: .method_not_allowed)
+				}
+			}
 		}
 		else {
 			http.new_response(status: .not_found, body: 'not found')
