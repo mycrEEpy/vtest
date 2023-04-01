@@ -1,9 +1,11 @@
 module app
 
 import net.http
+import log
 
-pub struct App {
+struct App {
 mut:
+	logger log.Log
 	status Status
 }
 
@@ -12,8 +14,16 @@ enum Status {
 	unavailable
 }
 
-fn (a App) handle(req http.Request) http.Response {
-	println('got request for ${req.url}')
+pub fn new(level log.Level) App {
+	mut a := App{}
+
+	a.logger.set_level(level)
+
+	return a
+}
+
+fn (mut a App) handle(req http.Request) http.Response {
+	a.logger.debug('got request for ${req.url}')
 
 	return match req.url {
 		'/' {
