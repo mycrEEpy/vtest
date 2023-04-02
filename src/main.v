@@ -4,11 +4,13 @@ import flag
 import os
 import app
 import log
+import vweb
 
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application('vtest')
 
+	addr := fp.string('listen-addr', `a`, '', 'listen address')
 	port := fp.int('listen-port', `p`, 8000, 'listen port')
 	help := fp.bool('help', `h`, false, 'print help')
 	level := fp.string('log-level', `l`, 'INFO', 'log level')
@@ -28,10 +30,18 @@ fn main() {
 		exit(1)
 	}
 
-	mut a := app.new(port, parsed_level)
+	mut logger := log.Log{}
+	logger.set_level(parsed_level)
 
-	os.signal_opt(.int, a.stop_on_signal)!
-	os.signal_opt(.term, a.stop_on_signal)!
+	logger.info('listening on ${addr}:${port}')
 
-	a.listen_and_serve()
+	vweb.run_at(app.new(logger), vweb.RunParams{
+		host: addr
+		port: port
+		family: .ip
+		show_startup_message: false
+	}) or {
+		eprintln('webserver failed: ${err}')
+		exit(1)
+	}
 }
